@@ -45,6 +45,23 @@ GROUP BY artist_name
 HAVING num_of_songs = (SELECT COUNT(artist_name) FROM BIT_DB.Spotifydata GROUP BY artist_name ORDER BY COUNT(artist_name) desc LIMIT 1)
 ORDER BY AVG(popularity) desc;
 
+/*Top 10 artists based on popularity*/
+SELECT artist_name, popularity
+FROM BIT_DB.Spotifydata
+ORDER BY popularity desc
+LIMIT 10;
+
+/*Artist with the longest song*/
+SELECT artist_name, duration_ms
+FROM BIT_DB.Spotifydata
+GROUP BY artist_name
+ORDER BY duration_ms desc LIMIT 1;
+
+/*Average danceability for the 10 most popular songs*/
+SELECT AVG(danceability)
+FROM BIT_DB.Spotifydata
+WHERE track_name IN (SELECT track_name FROM BIT_DB.Spotifydata ORDER BY popularity desc LIMIT 10);
+
 /*Top 10 most danceable songs*/
 SELECT track_name, danceability
 FROM BIT_DB.Spotifydata
