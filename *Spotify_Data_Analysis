@@ -27,4 +27,116 @@ time_signature integer NOT NULL
 #Then I inserted the Spotify Data .csv into the table.
 
 #Next, I explored the data using the following SQL. 
+SELECT * FROM BIT_DB.Spotifydata;
 
+/*List of Time Signatures and how many songs use each*/
+SELECT time_signature, COUNT(*)
+FROM BIT_DB.Spotifydata
+GROUP BY time_signature;
+
+/*Stats for songs in 3*/
+SELECT * FROM BIT_DB.Spotifydata
+WHERE time_signature = 3;
+
+/*Artist with the most top songs*/
+SELECT artist_name, COUNT(artist_name) num_of_songs, AVG(popularity)
+FROM BIT_DB.Spotifydata
+GROUP BY artist_name
+HAVING num_of_songs = (SELECT COUNT(artist_name) FROM BIT_DB.Spotifydata GROUP BY artist_name ORDER BY COUNT(artist_name) desc LIMIT 1)
+ORDER BY AVG(popularity) desc;
+
+/*Top 10 most danceable songs*/
+SELECT track_name, danceability
+FROM BIT_DB.Spotifydata
+GROUP BY track_name
+ORDER BY danceability desc
+LIMIT 10;
+
+/*Loudest Song*/
+SELECT track_name, loudness
+FROM BIT_DB.Spotifydata
+GROUP BY track_name
+HAVING loudness = (SELECT MAX(loudness) FROM BIT_DB.Spotifydata)
+ORDER BY loudness desc;
+
+/*Is the tempo above or below the average tempo*/
+SELECT track_name, tempo,
+CASE
+WHEN ROUND((tempo/(SELECT AVG(tempo) FROM BIT_DB.Spotifydata)),2) > 1 THEN 'Above Average'
+WHEN ROUND((tempo/(SELECT AVG(tempo) FROM BIT_DB.Spotifydata)),2) = 1 THEN 'Average'
+ELSE 'Below Average'
+END tempo_is
+FROM BIT_DB.Spotifydata
+ORDER BY tempo_is; 
+
+/*Artists with multiple songs in the Top 50*/
+SELECT artist_name, COUNT(artist_name) num_of_songs
+FROM BIT_DB.Spotifydata
+GROUP BY artist_name
+HAVING num_of_songs > 1;
+
+/*Artist with the highest average song popularity*/
+SELECT artist_name, AVG(popularity)
+FROM BIT_DB.Spotifydata
+GROUP BY artist_name
+HAVING AVG(popularity) = (SELECT AVG(popularity) FROM BIT_DB.Spotifydata GROUP BY artist_name ORDER BY AVG(popularity) DESC LIMIT 1);
+
+/*Best key and modality for a song to be "popular"*/
+SELECT song_key, ROUND(AVG(popularity), 2) avg_popularity
+FROM BIT_DB.Spotifydata
+GROUP BY song_key
+ORDER BY avg_popularity desc;
+
+SELECT song_mode, ROUND(AVG(popularity), 2) avg_popularity
+FROM BIT_DB.Spotifydata
+GROUP BY song_mode
+ORDER BY avg_popularity desc;
+
+/*Songs with most popular key and mode*/
+SELECT track_name, popularity, song_key, song_mode
+FROM BIT_DB.Spotifydata
+WHERE song_key IN (SELECT song_key FROM BIT_DB.Spotifydata GROUP BY song_key ORDER BY AVG(popularity) desc limit 1)
+AND song_mode IN (SELECT song_mode FROM BIT_DB.Spotifydata GROUP BY song_mode ORDER BY AVG(popularity) desc limit 1)
+GROUP BY track_name
+ORDER BY popularity;
+
+/*Analysing if a song is above or below average in danceability, energy, speechiness, acousticness, instrumentalness, liveness, or valence to determine if there are any patterns that influence popularity*/
+SELECT track_name, 
+CASE
+WHEN ROUND((danceability/(SELECT AVG(danceability) FROM BIT_DB.Spotifydata)),2) > 1 THEN 'Above Average'
+WHEN ROUND((danceability/(SELECT AVG(danceability) FROM BIT_DB.Spotifydata)),2) = 1 THEN 'Average'
+ELSE 'Below Average'
+END danceability_is,
+CASE
+WHEN ROUND((energy/(SELECT AVG(energy) FROM BIT_DB.Spotifydata)),2) > 1 THEN 'Above Average'
+WHEN ROUND((energy/(SELECT AVG(energy) FROM BIT_DB.Spotifydata)),2) = 1 THEN 'Average'
+ELSE 'Below Average'
+END energy_is,
+CASE
+WHEN ROUND((speechiness/(SELECT AVG(speechiness) FROM BIT_DB.Spotifydata)),2) > 1 THEN 'Above Average'
+WHEN ROUND((speechiness/(SELECT AVG(speechiness) FROM BIT_DB.Spotifydata)),2) = 1 THEN 'Average'
+ELSE 'Below Average'
+END speechiness_is,
+CASE
+WHEN ROUND((acousticness/(SELECT AVG(acousticness) FROM BIT_DB.Spotifydata)),2) > 1 THEN 'Above Average'
+WHEN ROUND((acousticness/(SELECT AVG(acousticness) FROM BIT_DB.Spotifydata)),2) = 1 THEN 'Average'
+ELSE 'Below Average'
+END acousticness_is,
+CASE
+WHEN ROUND((instrumentalness/(SELECT AVG(instrumentalness) FROM BIT_DB.Spotifydata)),2) > 1 THEN 'Above Average'
+WHEN ROUND((instrumentalness/(SELECT AVG(instrumentalness) FROM BIT_DB.Spotifydata)),2) = 1 THEN 'Average'
+ELSE 'Below Average'
+END instrumentalness_is,
+CASE
+WHEN ROUND((liveness/(SELECT AVG(liveness) FROM BIT_DB.Spotifydata)),2) > 1 THEN 'Above Average'
+WHEN ROUND((liveness/(SELECT AVG(liveness) FROM BIT_DB.Spotifydata)),2) = 1 THEN 'Average'
+ELSE 'Below Average'
+END liveness_is,
+CASE
+WHEN ROUND((valence/(SELECT AVG(valence) FROM BIT_DB.Spotifydata)),2) > 1 THEN 'Above Average'
+WHEN ROUND((valence/(SELECT AVG(valence) FROM BIT_DB.Spotifydata)),2) = 1 THEN 'Average'
+ELSE 'Below Average'
+END valence_is,
+popularity
+FROM BIT_DB.Spotifydata
+ORDER BY popularity desc; 
