@@ -157,3 +157,18 @@ END valence_is,
 popularity
 FROM BIT_DB.Spotifydata
 ORDER BY popularity desc; 
+
+/*Using a CTE to list artist and average popularity*/
+WITH artist_avg_popularity AS (
+    SELECT s.artist_name name,
+    AVG(s.popularity) avg_popularity
+    FROM SpotifyData s 
+GROUP BY s.artist_name
+)
+
+/*Listing artist with an average popularity over 90 and tagging them as Top Stars*/
+SELECT name, avg_popularity, 'Top Star' AS tag
+FROM artist_avg_popularity
+WHERE avg_popularity >= 90
+ORDER BY avg_popularity desc;
+
