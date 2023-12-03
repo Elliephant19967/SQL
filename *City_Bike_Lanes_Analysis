@@ -1,2 +1,26 @@
 # For this project I created a new table and imported the data about city bike lanes
-*Next I analyzed the data using the following 
+*Next I explored the data using the following SQL
+
+SELECT * FROM BIT_DB.CityBikeLanes LIMIT 10;
+
+SELECT * FROM BIT_DB.CityBikeLanes WHERE street='Walnut';
+
+/*CTE that list bike lanes with an average safety rating of 4.0 or higher as well as the average safety rating for each of those bike lanes*/
+WITH street_avg_cte AS (
+    SELECT street, AVG(safetyrating) rating
+    FROM CityBikeLanes
+    GROUP BY street
+)
+
+SELECT street, rating, 'safe lane' as 'label'
+FROM street_avg_cte
+WHERE rating>= 4.0;
+
+/*Using a window function to partition the data by street and list the safety rating provided by both technicians as well as provide recommendations based on average safety rating*/
+SELECT street, safetyrating, AVG(safetyrating) OVER (PARTITION BY street) as "Average_safety_rating",
+CASE
+WHEN AVG(safetyrating) OVER (PARTITION BY street) >= 4 THEN 'Leave As-Is'
+WHEN AVG(safetyrating) OVER (PARTITION BY street) < 2.5 THEN 'Remove'
+ELSE 'Improvements Needed'
+END recommendation
+FROM CityBikeLanes;
