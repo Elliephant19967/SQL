@@ -14,7 +14,7 @@ SELECT * FROM chinook.playlist_track;
 SELECT * FROM chinook.playlists;
 SELECT * FROM chinook.tracks;
 
-/*Show Customers (their full names, customer ID, and country) who are not in the US. (Hint: != or <> can be used to say "is not equal to").*/
+/*Show Customers (their full names, customer ID, and country) who are not in the US.*/
 SELECT FirstName || ' ' || LastName AS FullName, CustomerId, Country
 FROM chinook.customers
 WHERE Country <> 'USA';
